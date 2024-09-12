@@ -1,10 +1,11 @@
-const mongoos = require("mongoose");
+const mongoose = require("mongoose");
 
 
-const commentSchema = mongoos.Schema ({
+const commentSchema = mongoose.Schema ({
 
   description:{type:String, required:true},
-  author:{type:String, required: false},
+  author:{type:mongoose.Schema.Types.ObjectId, ref: "User", required : true},
+  post: {type:mongoose.Schema.Types.ObjectId, ref: "Post", required : true}
   
 }
 ,
@@ -12,4 +13,4 @@ const commentSchema = mongoos.Schema ({
 timestamp : true,
 })
 
-module.exports = mongoos.model("comment", commentSchema)
+module.exports = mongoose.model("Comment", commentSchema)

@@ -5,8 +5,10 @@ const mongoose = require("mongoose");
 const postSchema = mongoose.Schema(
     {
     message: {type:String,required:true},
-    author: {type:String,required:true},
-    imageUrl: {type:String}
+    imageUrl: {type:String},
+    author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+    // on fait un tableau pour pouvoir stocker tout les id des commentaire sur le post 
+    comment : [{type: mongoose.Schema.Types.ObjectId, ref: "Comment"}]
    },
     {
         // Permet de mettre leur a laquelle on fait le post et aussi l'heure à laquelle on le modifie 
@@ -14,4 +16,4 @@ const postSchema = mongoose.Schema(
     }
 )
 
-module.exports = mongoose.model("post", postSchema)
+module.exports = mongoose.model("Post", postSchema)
