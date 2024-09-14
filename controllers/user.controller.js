@@ -1,4 +1,5 @@
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken")
 
 const UserModel = require("../models/user.model");
 
@@ -37,8 +38,13 @@ UserModel.findOne({email: req.body.email})
             res.Status(401).json({message: 'paire identifiant/mdp incorrecte'})
         }else {
             res.status(200).json({
-                userId: user.pseudo,
-                token:'TOKEN'
+                userId: user._id,
+                // ici au lieu d'appeler un token ecrit en dure, on appel jwt
+                token:jwt.sign(
+                    { userId: user._id},
+                    'RANDOM_TOKEN_SECRET',
+                    {expiresIn: "24h"}
+                )
             })
         }
       })
