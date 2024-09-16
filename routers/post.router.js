@@ -1,14 +1,15 @@
 const express = require("express");
+const auth = require("../middleware/auth")
 const router = express.Router();
 const postController = require ("../controllers/post.controller")
 
-router.get("/", postController.getPost);
+router.get("/", auth, postController.getPost);
 
-router.post("/",  postController.sendPost);
+router.post("/", auth, postController.sendPost);
 
-router.put("/:id", postController.updatePost);
+router.put("/:id",auth, postController.updatePost);
 
-router.delete("/:id", postController.deletePost);
+router.delete("/:id",auth, postController.deletePost);
 
 // router.patch("/like-post/:id", (req,res) => {
 //     res.json({message: "le post liké id:" + req.params.id})

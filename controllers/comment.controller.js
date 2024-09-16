@@ -1,6 +1,7 @@
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
 
+
 module.exports.getComment = (req, res) => {
     CommentModel.find().populate('author').populate('post')
         .then(comments => res.status(200).json({ comments }))
@@ -10,8 +11,9 @@ module.exports.getComment = (req, res) => {
 module.exports.PostComment = (req, res) => {
     if (!req.body.description || !req.body.author || !req.body.post) {
         return res.status(400).json({ message: "Merci d'ajouter une description, l'ID du post et l'ID de l'auteur" });
-    }
+    } 
 
+    else {
     CommentModel.create({
       ...req.body
     })
@@ -32,6 +34,8 @@ module.exports.PostComment = (req, res) => {
     })
     .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la création de votre commentaire", err }));
 };
+}
+
 
 module.exports.updateComment = (req, res) => {
     CommentModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
@@ -39,10 +43,13 @@ module.exports.updateComment = (req, res) => {
             if (!updatedComment) {
                 return res.status(404).json({ message: "Commentaire non trouvé" });
             }
+            else {
             res.status(200).json(updatedComment);
+            }
         })
         .catch(err => res.status(500).json({ message: "La modification du commentaire a échoué", err }));
 };
+
 
 module.exports.deleteComment = (req, res) => {
     CommentModel.findById(req.params.id)
@@ -50,7 +57,7 @@ module.exports.deleteComment = (req, res) => {
             if (!comment) {
                 return res.status(404).json({ message: "Commentaire non trouvé" });
             }
-
+             else {
             return CommentModel.findByIdAndDelete(req.params.id)
                 .then(() => {
                     // Optionnel : mise à jour du post pour enlever l'ID du commentaire supprimé
@@ -59,6 +66,7 @@ module.exports.deleteComment = (req, res) => {
                         .catch(err => res.status(500).json({ message: "Erreur lors de la mise à jour du post", err }));
                 })
                 .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du commentaire", err }));
+            }
         })
         .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la recherche du commentaire", err }));
 };
