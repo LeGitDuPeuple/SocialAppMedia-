@@ -2,6 +2,7 @@ const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
 
 
+// affiché tout les commentaire 
 module.exports.getComment = (req, res) => {
     CommentModel.find().populate('author').populate('post')
         .then(comments => res.status(200).json({ comments }))
@@ -9,13 +10,19 @@ module.exports.getComment = (req, res) => {
 };
 
 module.exports.PostComment = (req, res) => {
-    if (!req.body.description || !req.body.author || !req.body.post) {
+    const userId = req.auth.userId;
+
+    // cette ligne de code veux dire que si la description, l'id dans le token ou l'id du post est vide = erreur 400
+    if (!req.body.description  || !req.body.post) {
         return res.status(400).json({ message: "Merci d'ajouter une description, l'ID du post et l'ID de l'auteur" });
     } 
 
     else {
     CommentModel.create({
-      ...req.body
+
+      ...req.body,
+      author: userId
+      
     })
     .then(newComment => {
         return PostModel.findByIdAndUpdate(
@@ -38,13 +45,18 @@ module.exports.PostComment = (req, res) => {
 
 
 module.exports.updateComment = (req, res) => {
+    const userId = req.auth.userId;
+
     CommentModel.findByIdAndUpdate(req.params.id, req.body, { new: true })
         .then(updatedComment => {
             if (!updatedComment) {
                 return res.status(404).json({ message: "Commentaire non trouvé" });
             }
+            else if(updatedComment.author.toString() !== userId) {
+                return res.status(403).json({message: "vous n'êtes pas autorisé à modifier ce commentaire"})
+            }
             else {
-            res.status(200).json(updatedComment);
+                 return res.status(200).json(updatedComment);
             }
         })
         .catch(err => res.status(500).json({ message: "La modification du commentaire a échoué", err }));
@@ -52,10 +64,15 @@ module.exports.updateComment = (req, res) => {
 
 
 module.exports.deleteComment = (req, res) => {
+    const userId = req.auth.userId;
+
     CommentModel.findById(req.params.id)
         .then(comment => {
             if (!comment) {
                 return res.status(404).json({ message: "Commentaire non trouvé" });
+            }
+            else if(comment.author.toString() !== userId) {
+             return res.status(403).json({message: "Vous n'êtes pas autoriser à modifier ce commentaire"});
             }
              else {
             return CommentModel.findByIdAndDelete(req.params.id)

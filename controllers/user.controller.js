@@ -41,7 +41,8 @@ UserModel.findOne({email: req.body.email})
                 userId: user._id,
                 // ici au lieu d'appeler un token ecrit en dure, on appel jwt
                 token:jwt.sign(
-                    { userId: user._id},
+                    { userId: user._id,userRole: user.role},
+                    
                     'RANDOM_TOKEN_SECRET',
                     {expiresIn: "24h"}
                 )
