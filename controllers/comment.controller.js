@@ -1,7 +1,6 @@
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
 
-
 // affiché tout les commentaire 
 module.exports.getComment = (req, res) => {
     CommentModel.find().populate('author').populate('post')
@@ -65,14 +64,15 @@ module.exports.updateComment = (req, res) => {
 
 module.exports.deleteComment = (req, res) => {
     const userId = req.auth.userId;
+    const role = req.auth.role
 
     CommentModel.findById(req.params.id)
         .then(comment => {
             if (!comment) {
                 return res.status(404).json({ message: "Commentaire non trouvé" });
             }
-            else if(comment.author.toString() !== userId) {
-             return res.status(403).json({message: "Vous n'êtes pas autoriser à modifier ce commentaire"});
+            else if(comment.author.toString() !== userId && role !== "admin") {
+             return res.status(403).json({message: "Vous n'êtes pas autoriser à modifier ce commentaire"})
             }
              else {
             return CommentModel.findByIdAndDelete(req.params.id)

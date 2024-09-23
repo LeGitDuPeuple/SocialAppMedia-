@@ -1,9 +1,13 @@
-const PostModel = require("../models/post.model")
+const PostModel = require("../models/post.model");
+const auth = require("../middleware/auth");
+
 
 module.exports.getPost = async (req, res) => {
     const posts = await PostModel.find();
     res.status(200).json({posts});
   };
+
+
   
   module.exports.sendPost = async (req, res) => {
     const userId = req.auth.userId;
@@ -23,7 +27,7 @@ module.exports.getPost = async (req, res) => {
   };
   
   module.exports.updatePost = (req, res) => {
-    const userId = req.auth.userId; // ID de l'utilisateur connecté, extrait du token JWT
+   
 
     PostModel.findById(req.params.id)
         .then(post => {
@@ -43,28 +47,22 @@ module.exports.getPost = async (req, res) => {
   
     module.exports.deletePost =  (req, res) => {
       const userId = req.auth.userId; // ID de l'utilisateur connecté, extrait du token JWT
-      // const role = req.user.role;
+      const role = req.auth.role;
     
       PostModel.findById(req.params.id)
         .then(post => {
           if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });
           } 
-          else if (post.author.toString() !== userId) {
+          else if (post.author.toString() !== userId && role !== "admin")  {
             return res.status(403).json({ message: "Vous n'êtes pas autorisé à supprimer ce post" });
           }
-          // else if (role == "admin" ){
-          //   // || post.author.toString == userId
-          //   return PostModel.findByIdAndDelete(req.params.id)
-          //     .then(() => res.status(200).json({ message: "Post supprimé" }))
-          //     .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du post", err }));
-
-          // }
-           else {
-            // Si le post existe et que l'utilisateur est l'auteur, on le supprime
+          else {
             return PostModel.findByIdAndDelete(req.params.id)
-              .then(() => res.status(200).json({ message: "Post supprimé" }))
-              .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du post", err }));
+            .then(() => res.status(200).json({ message: "Post supprimé" }))
+            .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du post", err }));
+
+        
           }
         })
         .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la recherche du post", err }));
