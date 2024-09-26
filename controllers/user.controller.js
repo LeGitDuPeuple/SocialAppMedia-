@@ -24,7 +24,7 @@ module.exports.signup = (req, res, next) => {
 
 //   user c'est pour vérifier l'email et valid c'est pour vérifier le mdp
 
-exports.login = (req, res) => {
+module.exports.login = (req, res) => {
 UserModel.findOne({email: req.body.email})
 .then(user => {
     if (user === null) {
@@ -58,3 +58,10 @@ UserModel.findOne({email: req.body.email})
 
 
 };
+
+module.exports.logout = (req, res) => {
+  // Pas de logique serveur réelle, on renvoie juste une confirmation de logout
+  res.status(200).json({ message: "Déconnexion réussie" });
+}
+
+// c'est une "fausse route", pour effectuer un logout, je vais supprimer le token via le front et rediriger l'utilisateur directement sur la page de connexion une fois le tokken supprimer 

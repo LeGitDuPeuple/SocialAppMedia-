@@ -1,12 +1,19 @@
+const commentModel = require("../models/comment.model");
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
 
 // affiché tout les commentaire 
 module.exports.getComment = (req, res) => {
-    CommentModel.find().populate('author').populate('post')
+    CommentModel.find()
         .then(comments => res.status(200).json({ comments }))
         .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la récupération des commentaires", err }));
 };
+
+module.exports.getOne = (req,res) => {
+commentModel.findById(req.params.id)
+.then(comments => res.status(201).json({comments}))
+.catch(err => res.status(401).json({message: "Ce commentaire n'existe pas", err}))
+}
 
 module.exports.PostComment = (req, res) => {
     const userId = req.auth.userId;
