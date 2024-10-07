@@ -1,4 +1,4 @@
-const commentModel = require("../models/comment.model");
+
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
 
@@ -10,16 +10,17 @@ module.exports.getComment = (req, res) => {
 };
 
 module.exports.getOne = (req,res) => {
-commentModel.findById(req.params.id)
+CommentModel.findById(req.params.id)
 .then(comments => res.status(201).json({comments}))
 .catch(err => res.status(401).json({message: "Ce commentaire n'existe pas", err}))
 }
 
 module.exports.PostComment = (req, res) => {
     const userId = req.auth.userId;
+    const postId = req.params.id;
 
     // cette ligne de code veux dire que si la description, l'id dans le token ou l'id du post est vide = erreur 400
-    if (!req.body.description  || !req.body.post) {
+    if (!req.body.description) {
         return res.status(400).json({ message: "Merci d'ajouter une description, l'ID du post et l'ID de l'auteur" });
     } 
 
@@ -27,12 +28,13 @@ module.exports.PostComment = (req, res) => {
     CommentModel.create({
 
       ...req.body,
-      author: userId
+      author: userId,
+      post: postId
       
     })
     .then(newComment => {
         return PostModel.findByIdAndUpdate(
-            req.body.post,
+            req.params.id,
             // le $push est un operateur de mise à jour de mongoDB 
             { $push: { comment: newComment._id } },
             { new: true }

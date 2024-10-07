@@ -3,9 +3,10 @@ const auth = require("../middleware/auth");
 
 // get de tout les post de la BDD 
 
-module.exports.getPost = async (req, res) => {
-    const posts = await PostModel.find();
-    res.status(200).json({posts});
+module.exports.getPost = (req, res) => {
+    PostModel.find()
+    .then(post => res.status(200).json({post}))
+    .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la récupération des post", err }));
   };
 
   module.exports.getOne = async (req,res) => {
@@ -35,7 +36,7 @@ module.exports.getPost = async (req, res) => {
   
   module.exports.updatePost = (req, res) => {
    
-
+    const userId = req.auth.userId;
     PostModel.findById(req.params.id)
         .then(post => {
             if (!post) {
@@ -48,6 +49,7 @@ module.exports.getPost = async (req, res) => {
         })
         .then(updatedPost => res.status(200).json(updatedPost))
         .catch(err => res.status(400).json({ message: "La modification du post a échoué", err }));
+        // Rajouter un .catch ici pour la premier promesse 
 };
 
 
