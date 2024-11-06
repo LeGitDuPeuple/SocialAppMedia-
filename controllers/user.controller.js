@@ -1,13 +1,14 @@
 const bcrypt = require("bcrypt");
+
 const jwt = require("jsonwebtoken")
 
 const UserModel = require("../models/user.model");
 
-module.exports.signup = (req, res, next) => {
+module.exports.signup = (req, res) => {
     bcrypt.hash(req.body.password, 10)
       .then(hash => {
         const user = new UserModel({
-         pseudo:req.body.pseudo,
+         pseudo: req.body.pseudo,
           email: req.body.email,
           password: hash,
            role: req.body.role || 'user',
@@ -16,9 +17,9 @@ module.exports.signup = (req, res, next) => {
         });
         user.save()
           .then(() => res.status(201).json({ message: "Utilisateur créé avec l'adresse suivante  " + req.body.email }))
-          .catch(error => res.status(400).json({ error }));
+          .catch(err => res.status(400).json({ err }));
       })
-      .catch(error => res.status(500).json({ error }));
+      .catch(err => res.status(500).json({message: "Une erreur s'est produite lors de la création de l'utilisateur", err }));
   };
 
 
@@ -44,15 +45,16 @@ UserModel.findOne({email: req.body.email})
                     { userId: user._id,userRole: user.role},
                     
                     'RANDOM_TOKEN_SECRET',
+                    
                     {expiresIn: "24h"}
                 )
             })
         }
       })
-      .catch((err) => res.status(500).json({err}))
+      .catch((err) => res.status(500).json({ message :"Une erreur s'est produite pendant la comparaison des mots de passe",err}))
     }
 })
-.catch((err) => res.status(500).json({err}))
+.catch((err) => res.status(500).json({ message:"une erreur s'est produite pendant le findOne",err}))
 
 
 

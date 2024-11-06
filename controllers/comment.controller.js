@@ -1,6 +1,7 @@
 
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
+const auth = require("../middleware/auth");
 
 // affiché tout les commentaire 
 module.exports.getComment = (req, res) => {
@@ -15,7 +16,7 @@ CommentModel.findById(req.params.id)
 .catch(err => res.status(401).json({message: "Ce commentaire n'existe pas", err}))
 }
 
-module.exports.PostComment = (req, res) => {
+module.exports.postComment = (req, res) => {
     const userId = req.auth.userId;
     const postId = req.params.id;
 
@@ -42,8 +43,9 @@ module.exports.PostComment = (req, res) => {
         .then(updatedPost => {
             if (!updatedPost) {
                 return res.status(404).json({ message: "Post non trouvé" });
-            }
+            }else { 
             res.status(201).json(newComment);
+            }
         })
         .catch(err => res.status(500).json({ message: "Erreur lors de la mise à jour du post", err }));
     })
@@ -88,7 +90,7 @@ module.exports.deleteComment = (req, res) => {
                 .then(() => {
                     // Optionnel : mise à jour du post pour enlever l'ID du commentaire supprimé
                     return PostModel.findByIdAndUpdate(comment.post, { $pull: { comment: req.params.id } })
-                        .then(() => res.status(200).json({ message: "Commentaire supprimé" }))
+                        .then((deletedComment) => res.status(200).json({ message: "Commentaire supprimé", deletedComment }))
                         .catch(err => res.status(500).json({ message: "Erreur lors de la mise à jour du post", err }));
                 })
                 .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la suppression du commentaire", err }));
