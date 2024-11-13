@@ -52,7 +52,7 @@ module.exports.getPost = (req, res) => {
  module.exports.updatePost = (req, res) => {
     const userId = req.auth.userId;
 
-    PostModel.findById(req.params.id)
+   return PostModel.findById(req.params.id)
         .then(post => {
             if (!post) {
                 return res.status(404).json({ message: "Ce post n'existe pas" });
@@ -82,7 +82,7 @@ module.exports.getPost = (req, res) => {
       const userId = req.auth.userId; 
       const role = req.auth.role;
     
-      PostModel.findById(req.params.id)
+      return PostModel.findById(req.params.id)
         .then(post => {
           if (!post) {
             return res.status(404).json({ message: "Post non trouvé" });

@@ -5,6 +5,7 @@ const connectDB = require('./config/database');
 const routerPost = require("./routers/post.router");
 const routerUser = require("./routers/user.router");
 const routerComment= require("./routers/comment.router");
+const path = require("path");
 
 // connexion à la data base 
 connectDB();
@@ -25,7 +26,7 @@ app.use(express.json());
 app.use("/api/post", routerPost);
 app.use("/api/auth", routerUser);
 app.use("/api/comment", routerComment);
-
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 // Sert à faire tourner le back sur le port 3000 de la machine 
 app.listen(port, () => {

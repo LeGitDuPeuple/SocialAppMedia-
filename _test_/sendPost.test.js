@@ -35,7 +35,6 @@ describe("Test du middleware sendPost", () => {
             ahthor: "author 1",
             comment: []
         }
-        
         PostModel.create.mockResolvedValue(createPost);
 
         const req = { 

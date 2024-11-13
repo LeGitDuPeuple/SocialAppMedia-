@@ -8,8 +8,8 @@ describe("Test du middleware getPost", () => {
   
     test("test la réponse 200", async () => {
         const posts = [
-            { id: 1, message: "post1", author: "author1", comment: [] },
-            { id: 2, message: "post2", author: "author2", comment: [] }
+            { id: 1, message: "post 1", author: "author 1", comment: [] },
+            { id: 2, message: "post 2", author: "author 2", comment: [] }
         ];
 
         // Permet de simuler le retour de posts (find)
