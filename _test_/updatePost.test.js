@@ -5,14 +5,15 @@ const {updatePost} = require("../controllers/post.controller");
 jest.mock("../models/post.model");
 
 describe("Test du middleware updatePost", () => {
+   
+    // Test de l'erreur 404 lors de la tentative de PostModel.findById pour retrouver un post 
     test("test de l'erreur 404", async () => {
 
         const req = {
-            params: { id: "valeur_id" }, // Paramètre de l'ID du post
-            auth: { userId: "1234567" }, // ID utilisateur
-            file: null,  // Pas de fichier
-            body: { message: "message" }, // Corps de la requête
-            get: jest.fn().mockReturnValue("localhost")
+            // l'id est déclaré comme null pour le test
+            params: { id:null },
+            // obligé de 'mocker' req.auth.userId, sinon le test ne peut pas fonctionner
+            auth: { userId: "1234567" }, 
         };
         
         const res = {
@@ -31,23 +32,21 @@ describe("Test du middleware updatePost", () => {
         expect(res.json).toHaveBeenCalledWith({ message: "Ce post n'existe pas" });
     });
 
-
+    // Test de l'erreur 403 lorsque l'id de l'author du post et celui de l'utilisateur connecté sont différents
     test("test de l'erreur 403", async () => {
-        // Simulez un post trouvé avec un autre auteur que l'utilisateur connecté
+
+        // Simulez un post trouvé avec un autre auteur différent de l'utilisateur connecté
         const post = { 
             _id: "valeur_id", 
-            author: "another_user_id", // ID différent de celui de req.auth.userId
+            author: "891011", 
             message: "Ancien message" 
         };
     
-        PostModel.findById.mockResolvedValue(post);  // Simule le post trouvé avec un auteur différent
+        PostModel.findById.mockResolvedValue(post);  
     
         const req = {
-            params: { id: "valeur_id" }, // Paramètre de l'ID du post
-            auth: { userId: "1234567" }, // ID utilisateur
-            file: null,  // Pas de fichier
-            body: { message: "message" }, // Corps de la requête
-            get: jest.fn().mockReturnValue("localhost")
+            params: { id: "valeur_id" }, 
+            auth: { userId: "1234567" }, 
         };
         
         const res = {
@@ -63,6 +62,7 @@ describe("Test du middleware updatePost", () => {
         expect(res.json).toHaveBeenCalledWith({ message: "Vous n'êtes pas autorisé à modifier ce post" });
     });
     
+    // Test du statut 200 lors de la réussite de modification du post 
     test("test de la réponse 200", async () => {
 
         // Définition du nouveau post qui sera renvoyé après mise à jour
@@ -73,15 +73,14 @@ describe("Test du middleware updatePost", () => {
             comment: []
         };
         
-        const req = { 
-            file: { imageUrl: '${req.protocol}://${req.get("host")}/images/${req.file.filename}' }, // Correction de l'interpolation
-            auth: { userId: "1234567" }, // ID utilisateur
-            body: { message: "message" }, // Corps de la requête
-            params: { id: "valeur_id" },  // Paramètre de l'ID du post
-            get: jest.fn().mockReturnThis("localhost")
+        const req = {  
+            auth: { userId: "1234567" }, 
+            params: { id: "valeur_id" },  
             
         };
-        // Mock de la méthode findByIdAndUpdate pour retourner un post mis à jour
+
+     
+        // mockResolvedValue sert à simuler une promesse qui réussit
         PostModel.findById.mockResolvedValue();
     
         
@@ -92,92 +91,87 @@ describe("Test du middleware updatePost", () => {
             json: jest.fn()                     // Mock de la méthode json
         };
 
-        if (req.file) {
-            updatePost.imageUrl = '${req.protocol}://${req.get("host")}/images/${req.file.filename}';
-        }
-    
         // Appel de la fonction updatePost
         await updatePost(req, res);
+
+        // Résultat de la réussite de PostModel.findById
         PostModel.findByIdAndUpdate.mockResolvedValue(newPost)
     
 
     });
     
+    // test de l'erreur 500 si la tentative de modification du post échoue 
     test("test de l'erreur 500", async () => {
-        const err = new Error("error")
-        PostModel.findById.mockRejectedValue(err)
+
+        const err = new Error("error");
+
+        PostModel.findById.mockRejectedValue(err);
 
         const req = { 
-            file: { imageUrl: '${req.protocol}://${req.get("host")}/images/${req.file.filename}' }, // Correction de l'interpolation
-            auth: { userId: "1234567" }, // ID utilisateur
-            body: { message: "message" }, // Corps de la requête
-            params: { id: "valeur_id" },  // Paramètre de l'ID du post
-            get: jest.fn().mockReturnThis("localhost")
+            auth: { userId: "1234567" }, 
+            params: { id: "valeur_id" },  
         };
 
         const res = {
-            status: jest.fn().mockReturnThis(),  // Mock de la méthode status
-            json: jest.fn()                     // Mock de la méthode json
+            status: jest.fn().mockReturnThis(),  
+            json: jest.fn()                     
         };
 
         await updatePost( req,res);
 
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-            message: "Erreur lors de la tentative de modification du post",
-             err: err
-        });
+        expect(res.json).toHaveBeenCalledWith({  message: "Erreur lors de la tentative de modification du post", err: err});
     })
 
-        test("test modification updatpost", async () => {
+    // Test du statut 201 lorsque la tentative de modification du post réussie 
+    test("test modification updatePost", async () => {
           
-          const post = {
+        // Mock du post initial 
+        const post = {
             id: 1,
             message: "post",
             author: "1234567",
             comment: []
         };
-            const newPost = {
-                id: 1,
-                message: "new post",
-                author: "1234567",
-                comment: []
-            };
-            PostModel.findById.mockResolvedValue(post)
-            PostModel.findByIdAndUpdate.mockResolvedValue(newPost);
-
-            const req = { 
-                file: { imageUrl: '${req.protocol}://${req.get("host")}/images/${req.file.filename}' }, 
-                auth: { userId: "1234567" },
-                body: { message: "message" }, // Corps de la requête
-                params: { id: "valeur_id" },  // Paramètre de l'ID du post
-                get: jest.fn().mockReturnThis("localhost")
-            };
+        // mock du nouveau post 
+        const newPost = {
+            id: 1,
+            message: "new post",
+            author: "1234567",
+            comment: []
+        };
+            
+        const req = { 
+            auth: { userId: "1234567" },
+            params: { id: "valeur_id" },  
+        };
     
-            const res = {
-                status: jest.fn().mockReturnThis(),  // Mock de la méthode status
-                json: jest.fn()                     // Mock de la méthode json
-            };
+        const res = {
+            status: jest.fn().mockReturnThis(),  
+            json: jest.fn()                     
+        };
+
+        PostModel.findById.mockResolvedValue(post)
+        PostModel.findByIdAndUpdate.mockResolvedValue(newPost);
+
            
-           await updatePost(req,res);
+        await updatePost(req,res);
            
-            expect(res.status).toHaveBeenCalledWith(200);
-            expect(res.json).toHaveBeenCalledWith(newPost);
+        expect(res.status).toHaveBeenCalledWith(200);
+        expect(res.json).toHaveBeenCalledWith(newPost);
          
-})
+    })
     
 
+    // Test de l'erreur 400 lorsque la tentative de modification a échoué (après que PostModel.findById ait réussi)
     test("Test erreur 400", async () => {
         
         const err = new Error ("erreur");
 
         PostModel.findByIdAndUpdate.mockRejectedValue(err)
         const req = { 
-            file: { imageUrl: '${req.protocol}://${req.get("host")}/images/${req.file.filename}' }, 
             auth: { userId: "1234567" },
-            body: { message: "message" }, // Corps de la requête
-            params: { id: "valeur_id" },  // Paramètre de l'ID du post
-            get: jest.fn().mockReturnThis("localhost")
+            params: { id: "valeur_id" },  
         };
 
         const res = {
@@ -185,15 +179,10 @@ describe("Test du middleware updatePost", () => {
             json: jest.fn()
         }
         
-     await updatePost(req,res)
+        await updatePost(req,res)
 
         expect(res.status).toHaveBeenCalledWith(400);
         expect(res.json).toHaveBeenCalledWith(
-            {message: "La modification du post a échoué",
-            err: err
-            })
-
-
+            {message: "La modification du post a échoué", err: err})
     })
 })
-   

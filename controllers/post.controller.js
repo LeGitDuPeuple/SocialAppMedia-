@@ -31,17 +31,14 @@ module.exports.getPost = (req, res) => {
 
     if (!req.body.message) {
       res.status(400).json({ message: "Merci d'ajouter un message" });
-    } 
-    
+    }   
       const creatPost = {
         ...req.body,
         author : userId
       }
-
       if(req.file) {
         creatPost.imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-      }
-    
+      }  
   
     return PostModel.create(creatPost)
     .then((post) => res.status(201).json({post}))
