@@ -37,7 +37,7 @@ describe("Test du middleware sendPost", () => {
     })
 
     // Test du status 200 lors de la tentative de création d'un post
-    test("Test du status 200", async () => {
+    test("Test du status 201", async () => {
         
         
         // mock de l'objet créé

@@ -15,9 +15,7 @@ describe("Test du middleware getPost", () => {
             { id: 2, message: "post 2", author: "author 2", comment: [] }
         ];
 
-        // Simule la méthode `find` pour renvoyer les posts ci-dessus.
-        PostModel.find.mockResolvedValue(posts); 
-
+        
         // Simule une req (il n'y a pas de paramètres spécifiques à ajouter).
         const req = {};
         
@@ -27,6 +25,10 @@ describe("Test du middleware getPost", () => {
             json: jest.fn()
         };
 
+        
+        // Simule la méthode `find` pour renvoyer les posts ci-dessus.
+        PostModel.find.mockResolvedValue(posts); 
+        
         // Appelle la fonction getPost avec req et res.
         await getPost(req, res);
 

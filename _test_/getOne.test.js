@@ -1,6 +1,6 @@
 const PostModel = require("../models/post.model");
 const { getOne } = require('../controllers/post.controller'); 
-const { param } = require("../routers/post.router");
+
 
 jest.mock('../models/post.model');
 
@@ -34,7 +34,9 @@ describe("Test du middleware getOne", () => {
     // Test de l'erreur 404 qui survient lorsque la condition du middleware est true et que le post n'existe pas
     test("test de l'erreur 404", async () => {
 
-        const req = { params: { id: "valeur_id" } };
+        const req = {
+             params: { id: "valeur_id" }
+             };
 
         const res = {
 

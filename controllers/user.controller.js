@@ -4,39 +4,42 @@ const jwt = require("jsonwebtoken")
 
 const UserModel = require("../models/user.model");
 
-module.exports.signup = (req, res) => {
-    bcrypt.hash(req.body.password, 10)
+module.exports.signup = (req, res)  => async () => {
+ 
+  return bcrypt.hash(req.body.password, 10)
       .then(hash => {
-        const user = new UserModel({
-         pseudo: req.body.pseudo,
-          email: req.body.email,
-          password: hash,
-           role: req.body.role || 'user',
-          
-
-        });
-        user.save()
-          .then(() => res.status(201).json({ message: "Utilisateur créé avec l'adresse suivante  " + req.body.email }))
-          .catch(err => res.status(400).json({ err }));
+         return UserModel.create({
+              pseudo: req.body.pseudo,
+              email: req.body.email,
+              password: hash,
+              role: req.body.role || 'user',
+          })
+              .then(() => { res.status(201).json({message: "Utilisateur créé avec l'adresse suivante " + req.body.email});
+              })
+              .catch(err => res.status(400).json({ err }));
       })
-      .catch(err => res.status(500).json({message: "Une erreur s'est produite lors de la création de l'utilisateur", err }));
-  };
+      .catch(err => res.status(500).json({ message: "Une erreur s'est produite lors de la création de l'utilisateur", err }));
+};
+
+
 
 
 //   user c'est pour vérifier l'email et valid c'est pour vérifier le mdp
 
 module.exports.login = (req, res) => {
-UserModel.findOne({email: req.body.email})
+
+return UserModel.findOne({email: req.body.email})
 .then(user => {
     if (user === null) {
         // Ici, nous utilisons un message "évasif" pour éviter de révéler si un utilisateur est inscrit ou non. Cela permet de prévenir une fuite de données
-        res.status(401).json({message: "Paire identifiant/mdp incorrecte"})
-    }else {
+       return res.status(401).json({message: "Paire identifiant/mdp incorrecte"})
+    }
+    else {
         // ici, on met en premier argument la requête que ont envoie, et en second argument, on met le mdp dans la bdd
-        bcrypt.compare(req.body.password, user.password)
+       return bcrypt.compare(req.body.password, user.password)
       .then(valid => {
         if(!valid) {
-            res.Status(401).json({message: 'paire identifiant/mdp incorrecte'})
+           return res.Status(401).json({message: 'paire identifiant/mdp incorrecte'})
         }else {
             res.status(200).json({
                 userId: user._id,
@@ -51,7 +54,7 @@ UserModel.findOne({email: req.body.email})
             })
         }
       })
-      .catch((err) => res.status(500).json({ message :"Une erreur s'est produite pendant la comparaison des mots de passe",err}))
+      .catch((err) =>  res.status(500).json({ message :"Une erreur s'est produite pendant la comparaison des mots de passe",err})) 
     }
 })
 .catch((err) => res.status(500).json({ message:"une erreur s'est produite pendant le findOne",err}))
