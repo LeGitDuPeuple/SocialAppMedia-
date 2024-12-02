@@ -4,8 +4,8 @@ const jwt = require("jsonwebtoken")
 
 const UserModel = require("../models/user.model");
 
-module.exports.signup = (req, res)  => async () => {
- 
+module.exports.signup = async (req, res) => {
+
   return bcrypt.hash(req.body.password, 10)
       .then(hash => {
          return UserModel.create({
@@ -26,42 +26,35 @@ module.exports.signup = (req, res)  => async () => {
 
 //   user c'est pour vérifier l'email et valid c'est pour vérifier le mdp
 
+// Middleware de connexion utilisateur
 module.exports.login = (req, res) => {
-
-return UserModel.findOne({email: req.body.email})
-.then(user => {
-    if (user === null) {
+  return UserModel.findOne({ email: req.body.email })
+    .then(user => {
+      if (user === null) {
         // Ici, nous utilisons un message "évasif" pour éviter de révéler si un utilisateur est inscrit ou non. Cela permet de prévenir une fuite de données
-       return res.status(401).json({message: "Paire identifiant/mdp incorrecte"})
-    }
-    else {
-        // ici, on met en premier argument la requête que ont envoie, et en second argument, on met le mdp dans la bdd
-       return bcrypt.compare(req.body.password, user.password)
-      .then(valid => {
-        if(!valid) {
-           return res.Status(401).json({message: 'paire identifiant/mdp incorrecte'})
-        }else {
-            res.status(200).json({
+        return res.status(401).json({ message: "Paire identifiant/mdp incorrecte" });
+      } else {
+        // Ici, on met en premier argument la requête que l'on envoie, et en second argument, on met le mdp dans la bdd
+        return bcrypt.compare(req.body.password, user.password)
+          .then(valid => {
+            if (!valid) {
+              return res.status(401).json({ message: 'Paire identifiant/mdp incorrecte' });
+            } else {
+              res.status(200).json({
                 userId: user._id,
-                // ici au lieu d'appeler un token ecrit en dure, on appel jwt
-                token:jwt.sign(
-                    { userId: user._id,userRole: user.role},
-                    
-                    'RANDOM_TOKEN_SECRET',
-                    
-                    {expiresIn: "24h"}
+                // Ici, au lieu d'appeler un token écrit en dur, on appelle jwt
+                token: jwt.sign(
+                  { userId: user._id, userRole: user.role },
+                  'RANDOM_TOKEN_SECRET',
+                  { expiresIn: "24h" }
                 )
-            })
-        }
-      })
-      .catch((err) =>  res.status(500).json({ message :"Une erreur s'est produite pendant la comparaison des mots de passe",err})) 
-    }
-})
-.catch((err) => res.status(500).json({ message:"une erreur s'est produite pendant le findOne",err}))
-
-
-
-
+              });
+            }
+          })
+          .catch((err) => res.status(500).json({ message: "Une erreur s'est produite pendant la comparaison des mots de passe", err }));
+      }
+    })
+    .catch((err) => res.status(500).json({ message: "Une erreur s'est produite pendant le findOne", err }));
 };
 
 module.exports.logout = (req, res) => {

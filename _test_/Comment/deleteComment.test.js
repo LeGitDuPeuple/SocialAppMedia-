@@ -78,6 +78,7 @@ describe('teste du middlewar deleteComment', () => {
         await deleteComment(req,res);
         // mise à jour du post sans le commentaire supprimer,
         CommentModel.findByIdAndDelete.mockResolvedValue(comment);
+        
     })
 
     test("réussite du Post findByIdAndUpdate", async () => {
@@ -111,8 +112,10 @@ describe('teste du middlewar deleteComment', () => {
     
         // Vérifie si PostModel.findByIdAndUpdate est appelé correctement
         expect(PostModel.findByIdAndUpdate).toHaveBeenCalledWith(
-            "post1", // ID du post lié au commentaire
-            { $pull: { comment: "valeur_id" } } // Suppression du commentaire dans le tableau "comment"
+          // ID du post lié au commentaire
+            "post1", 
+            // Suppression du commentaire dans le tableau "comment"
+            { $pull: { comment: "valeur_id" } } 
         );
     
         // Vérifie que le statut 200 est renvoyé
@@ -121,13 +124,6 @@ describe('teste du middlewar deleteComment', () => {
     });
     
  test("Erreur 500 lors du findByIdDelete", async () => {
-
-    const comment = { 
-        _id: "valeur_id",
-        description: "commentaire",
-        author: "1234567", 
-        post: "post1" // 
-    };
 
     const err = new Error("error");
 
@@ -141,8 +137,6 @@ describe('teste du middlewar deleteComment', () => {
         json: jest.fn(),
     };
 
-
-      
         PostModel.findByIdAndUpdate.mockRejectedValue(err);
 
     await deleteComment(req,res);

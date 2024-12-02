@@ -153,7 +153,7 @@ describe ("test", () => {
 
         const res = {
 
-            // mockReturnThis permet de renvoyé res pour permettre de l'appeler plusieur fois. 
+            
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
@@ -163,7 +163,7 @@ describe ("test", () => {
 
         await login(req,res);
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({message:"une erreur s'est produite pendant le findOne",err:err});
+        expect(res.json).toHaveBeenCalledWith({message:"Une erreur s'est produite pendant le findOne",err:err});
     })
     
     

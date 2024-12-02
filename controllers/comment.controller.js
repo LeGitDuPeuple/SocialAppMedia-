@@ -12,7 +12,7 @@ module.exports.getComment = (req, res) => {
 
 module.exports.getOne = (req,res) => {
 return CommentModel.findById(req.params.id)
-.then(comments => res.status(201).json({comments}))
+.then(comments => res.status(200).json({comments}))
 .catch(err => res.status(401).json({message: "Ce commentaire n'existe pas", err}))
 }
 

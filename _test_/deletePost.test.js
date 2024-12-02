@@ -38,9 +38,7 @@ describe("Test du middleware deletePost", () => {
             message: "Ancien message" 
         };
         
-        // Simule une promesse réussie renvoyant un post
-        PostModel.findById.mockResolvedValue(post);
-
+        
         const req = {
             params: { id: "valeur_id" }, 
             auth: { userId: "1234567" },
@@ -49,6 +47,8 @@ describe("Test du middleware deletePost", () => {
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
+        // Simule une promesse réussie renvoyant un post
+        PostModel.findById.mockResolvedValue(post);
 
         await deletePost(req, res);
         expect(res.status).toHaveBeenCalledWith(403);
@@ -110,8 +110,7 @@ describe("Test du middleware deletePost", () => {
 
         const req = {
             params: { id: "valeur_id" }, 
-            auth: { userId: "1234567" },
-            body: { message: "message" }, 
+            auth: { userId: "1234567" } 
         };
         const res = {
             status: jest.fn().mockReturnThis(),

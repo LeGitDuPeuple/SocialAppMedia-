@@ -7,7 +7,7 @@ jest.mock("../../models/comment.model");
 describe("Test du middleware", () => {
 
     // Test de la réponse 200 lorsque la récupération d'un commentaire réussit 
-    test("test réponse 201", async () => {
+    test("test réponse 200", async () => {
 
         const req = {
             params: {id: "valeur_id"},
@@ -22,8 +22,7 @@ describe("Test du middleware", () => {
         CommentModel.findById.mockResolvedValue(req.params.id);
         
         await getOne(req, res);
-        expect(res.status).toHaveBeenCalledWith(201);
-        // Par exemple, le résultat en JSON, c'est jest qui déclare ce qu'il attend
+        expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({comments: "valeur_id"});
     });
 

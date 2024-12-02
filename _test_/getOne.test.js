@@ -26,7 +26,8 @@ describe("Test du middleware getOne", () => {
         // Pas besoin de créer un post ici car seul l'id est attendu et il est défini dans req
         // Appel du middleware getPost avec req et res 
         await getOne(req, res);
-        // vérifie que le status 200 est bien envoyé avec le matchers
+    
+        
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith({ post: "valeur_id" });
     });
@@ -35,7 +36,7 @@ describe("Test du middleware getOne", () => {
     test("test de l'erreur 404", async () => {
 
         const req = {
-             params: { id: "valeur_id" }
+             params: { id: null }
              };
 
         const res = {

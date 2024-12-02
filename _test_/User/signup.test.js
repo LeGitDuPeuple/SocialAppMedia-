@@ -7,10 +7,9 @@ jest.mock("bcrypt");
 
 describe("test du middleware", () => {
 
+    // Test 201 lorsqu'un utilisateur est créer 
     test("réponse 201", async () => {
-
-        // const hash = jest.fn();
-
+   
        const newUser = {
         pseudo: "pseudo",
         email: "email",
@@ -30,62 +29,87 @@ describe("test du middleware", () => {
         }
 
         const res = {
-
-            // mockReturnThis permet de renvoyé res pour permettre de l'appeler plusieur fois. 
             status: jest.fn().mockReturnThis(),
             json: jest.fn()
         };
 
+         
         bcrypt.hash.mockResolvedValue(true);
-        // UserModel.create.mockResolvedValue(newUser);
+        UserModel.create.mockResolvedValue(newUser);
+       
 
         await signup(req,res);
         expect(res.status).toHaveBeenCalledWith(201);
-        expect(res.json).toHaveBeenCalledWith({message: "Utilisateur créé avec l'adresse suivante " + req.body.email})
+        expect(res.json).toHaveBeenCalledWith({message: "Utilisateur créé avec l'adresse suivante " + req.body.email});
        
 
 
     })
 
-    test("test de l'erreur 500 si UserModel.create échoue", async () => {
-        const err = new Error("Erreur simulée");
+    // Test lorsque la création d'un utilisateur échoue
+    test("test de l'erreur 400 ", async () => {
     
-        const req = {
-            body: {
-                pseudo: "pseudo",
-                email: "email@test.com",
-                password: "plainPassword",
-                role: "user",
-            },
-        };
+        const err = new Error("err");
+
+            const req = 
+            {
+                body:
+                {
+                 pseudo: "pseudo",
+                email: "email",
+                password: "hash",
+                role: "req.body.role || 'user'"
+               }
     
+            }
+    
+            const res = {
+                status: jest.fn().mockReturnThis(),
+                json: jest.fn()
+            };
+    
+            
+                    
+            
+            bcrypt.hash.mockResolvedValue(true);
+            UserModel.create.mockRejectedValue(err);
+           
+    
+            await signup(req,res);
+            expect(res.status).toHaveBeenCalledWith(400);
+            expect(res.json).toHaveBeenCalledWith({err:err});
+           
+})
+
+test("test de l'erreur 500", async () => {
+
+    const err = new Error("error");
+    
+    const req = 
+    {
+        body:
+        {
+            pseudo: "pseudo",
+            email: "email",
+            password: "hash",
+            role: "req.body.role || 'user'"
+        }
+        
+    }
+    
+
         const res = {
             status: jest.fn().mockReturnThis(),
-            json: jest.fn(),
+            json: jest.fn()
         };
-    
-        bcrypt.hash.mockResolvedValue("hashedPassword");
-        UserModel.create.mockRejectedValue(err);
-    
-        await signup(req, res);
-    
-        // Vérifie que bcrypt.hash est appelé avec les bons arguments
-        expect(bcrypt.hash).toHaveBeenCalledWith(req.body.password, 10);
-    
-        // Vérifie que UserModel.create est appelé avec les bons arguments
-        expect(UserModel.create).toHaveBeenCalledWith({
-            pseudo: req.body.pseudo,
-            email: req.body.email,
-            password: "hashedPassword",
-            role: req.body.role,
-        });
-    
-        // Vérifie que le statut 500 et le message JSON sont renvoyés
+
+         
+        bcrypt.hash.mockRejectedValue(err);
+
+        await signup(req,res);
+
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-            message: "Une erreur s'est produite lors de la création de l'utilisateur",
-            err: err,
-        });
-    });
-    
+        expect(res.json).toHaveBeenCalledWith({message: "Une erreur s'est produite lors de la création de l'utilisateur", err:err})
 })
+})
+

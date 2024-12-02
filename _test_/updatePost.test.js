@@ -35,7 +35,7 @@ describe("Test du middleware updatePost", () => {
     // Test de l'erreur 403 lorsque l'id de l'author du post et celui de l'utilisateur connecté sont différents
     test("test de l'erreur 403", async () => {
 
-        // Simulez un post trouvé avec un autre auteur différent de l'utilisateur connecté
+        
         const post = { 
             _id: "valeur_id", 
             author: "891011", 
@@ -54,10 +54,9 @@ describe("Test du middleware updatePost", () => {
             json: jest.fn()
         };
     
-        // Appel de la fonction middleware
+  
         await updatePost(req, res);
     
-        // Vérification du statut 403 et du message
         expect(res.status).toHaveBeenCalledWith(403);
         expect(res.json).toHaveBeenCalledWith({ message: "Vous n'êtes pas autorisé à modifier ce post" });
     });
@@ -79,18 +78,14 @@ describe("Test du middleware updatePost", () => {
             
         };
 
-     
-        // mockResolvedValue sert à simuler une promesse qui réussit
-        PostModel.findById.mockResolvedValue();
-    
-        
-    
         // Simulation de la réponse
         const res = {
-            status: jest.fn().mockReturnThis(),  // Mock de la méthode status
-            json: jest.fn()                     // Mock de la méthode json
+            status: jest.fn().mockReturnThis(),  
+            json: jest.fn()               
         };
-
+        
+        // mockResolvedValue sert à simuler une promesse qui réussit
+        PostModel.findById.mockResolvedValue();
         // Appel de la fonction updatePost
         await updatePost(req, res);
 
@@ -123,40 +118,31 @@ describe("Test du middleware updatePost", () => {
         expect(res.json).toHaveBeenCalledWith({  message: "Erreur lors de la tentative de modification du post", err: err});
     })
 
-    // Test du statut 201 lorsque la tentative de modification du post réussie 
+    // Test du statut 200 lorsque la tentative de modification du post réussie 
     test("test modification updatePost", async () => {
-          
-        // Mock du post initial 
         const post = {
             id: 1,
             message: "post",
             author: "1234567",
             comment: []
         };
-        // mock du nouveau post 
         const newPost = {
             id: 1,
             message: "new post",
             author: "1234567",
             comment: []
-        };
-            
+        };      
         const req = { 
             auth: { userId: "1234567" },
             params: { id: "valeur_id" },  
-        };
-    
+        }; 
         const res = {
             status: jest.fn().mockReturnThis(),  
             json: jest.fn()                     
         };
-
         PostModel.findById.mockResolvedValue(post)
-        PostModel.findByIdAndUpdate.mockResolvedValue(newPost);
-
-           
-        await updatePost(req,res);
-           
+        PostModel.findByIdAndUpdate.mockResolvedValue(newPost);      
+        await updatePost(req,res);      
         expect(res.status).toHaveBeenCalledWith(200);
         expect(res.json).toHaveBeenCalledWith(newPost);
          
