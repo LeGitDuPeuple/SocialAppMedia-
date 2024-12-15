@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 
 //permet de traité les donneés de la request et de tansofrmer le JSON en objet js utilisable
 app.use(express.json());
-// app.use(express.urlencoded({extended: false}));
+
 
 app.use("/api/post", routerPost);
 app.use("/api/auth", routerUser);

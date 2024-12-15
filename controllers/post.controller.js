@@ -1,5 +1,6 @@
 const PostModel = require("../models/post.model");
-const auth = require("../middleware/auth");
+
+
 
 // get de tout les post de la BDD 
 
@@ -11,6 +12,7 @@ module.exports.getPost = (req, res) => {
       });
 };
 
+// get d'un seul post de la BDD 
 
   module.exports.getOne =  (req,res) => {
    
@@ -25,25 +27,32 @@ module.exports.getPost = (req, res) => {
   }
 
 
-  
-  module.exports.sendPost =  (req, res) => {
+  // créer un post 
+  module.exports.sendPost = (req, res) => {
     const userId = req.auth.userId;
 
     if (!req.body.message) {
-      res.status(400).json({ message: "Merci d'ajouter un message" });
-    }   
-      const creatPost = {
-        ...req.body,
-        author : userId
-      }
-      if(req.file) {
-        creatPost.imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
-      }  
-  
-    return PostModel.create(creatPost)
-    .then((post) => res.status(201).json({post}))
-    .catch((err) => res.status(400).json({message: "erreur lors de la création du post", err}))
-  }
+        return res.status(400).json({ message: "Merci d'ajouter un message" });
+    } else {
+        const creatPost = {
+            ...req.body,
+            author: userId,
+        };
+
+        if (req.file) {
+            creatPost.imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
+        }
+
+         PostModel.create(creatPost)
+            .then((post) => {
+                return res.status(201).json({ post });
+            })
+            .catch((err) => {
+                return res.status(400).json({ message: "Erreur lors de la création du post", err });
+            });
+    }
+};
+
 
   
  module.exports.updatePost = (req, res) => {
@@ -56,15 +65,12 @@ module.exports.getPost = (req, res) => {
             } else if (post.author.toString() !== userId) {
                 return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier ce post" });
             } else {
-                // Construire l'objet des données de mise à jour
+              
                 const updatePost = { ...req.body };
 
-                // Si une nouvelle image est téléchargée, ajoutez l'URL de l'image au modèle de mise à jour
                 if (req.file) {
                     updatePost.imageUrl = `${req.protocol}://${req.get("host")}/images/${req.file.filename}`;
                 }
-
-                // Mettre à jour le post avec les nouvelles données
                 return PostModel.findByIdAndUpdate(post._id, updatePost, { new: true })
                     .then(updatedPost => res.status(200).json(updatedPost))
                     .catch(err => res.status(400).json({ message: "La modification du post a échoué", err }));

@@ -27,7 +27,7 @@ module.exports.signup = async (req, res) => {
 //   user c'est pour vérifier l'email et valid c'est pour vérifier le mdp
 
 // Middleware de connexion utilisateur
-module.exports.login = (req, res) => {
+module.exports.login = async (req, res) => {
   return UserModel.findOne({ email: req.body.email })
     .then(user => {
       if (user === null) {
@@ -62,4 +62,4 @@ module.exports.logout = (req, res) => {
   res.status(200).json({ message: "Déconnexion réussie" });
 }
 
-// c'est une "fausse route", pour effectuer un logout, je vais supprimer le token via le front et rediriger l'utilisateur directement sur la page de connexion une fois le tokken supprimer 
+// c'est une "fausse route", pour effectuer un logout, pour ce faire, je vais d'abord mettre le token dans le local storage lors de la connexion. Ensuite, pour effectuer une déconexion, je vais supprimer le token via le front et rediriger l'utilisateur directement sur la page de connexion une fois le token supprimer 

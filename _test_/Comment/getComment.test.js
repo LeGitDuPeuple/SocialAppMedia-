@@ -5,6 +5,7 @@ const {getComment} = require("../../controllers/comment.controller");
 jest.mock("../../models/comment.model");
 
 describe("test du middleware GetComment", () => {
+    
     // Test de la réponse 200 lorsque la tentative de récupération des commentaires réussit
     test("test réponse 200", async () => {
 

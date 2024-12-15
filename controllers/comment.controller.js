@@ -1,7 +1,7 @@
 
 const CommentModel = require("../models/comment.model");
 const PostModel = require("../models/post.model");
-const auth = require("../middleware/auth");
+
 
 // affiché tout les commentaire 
 module.exports.getComment = (req, res) => {
@@ -20,19 +20,16 @@ module.exports.postComment = (req, res) => {
     const userId = req.auth.userId;
     const postId = req.params.id;
 
-    // cette ligne de code veux dire que si la description, l'id dans le token ou l'id du post est vide = erreur 400
     if (!req.body.description) {
         return res.status(400).json({ message: "Merci d'ajouter une description, l'ID du post et l'ID de l'auteur" });
     } 
-
     else {
-   return CommentModel.create({
-
-      ...req.body,
-      author: userId,
-      post: postId
-      
-    })
+        const createComment = {
+            ...req.body,
+            author: userId,
+            post: postId
+        }
+   return CommentModel.create(createComment)
     .then(newComment => {
         return PostModel.findByIdAndUpdate(
             req.params.id,

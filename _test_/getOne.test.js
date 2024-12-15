@@ -57,7 +57,6 @@ describe("Test du middleware getOne", () => {
     // Test de l'erreur 500 lorsqu'une erreur survient pendant la tentative de récupération du post
     test("test de l'erreur 500", async () => {
 
-        // Crée une erreur pour simuler le rejet de la promesse
         const err = new Error("error");
 
 
@@ -71,12 +70,8 @@ describe("Test du middleware getOne", () => {
         };
     
         await getOne(req, res);
-    
-        // Vérifie que le statut 500 est bien renvoyé avec le matchers
+
         expect(res.status).toHaveBeenCalledWith(500);
-        expect(res.json).toHaveBeenCalledWith({
-            message: "Une erreur s'est produite lors de la récupération du post",
-            err: err
-        });
+        expect(res.json).toHaveBeenCalledWith({ message: "Une erreur s'est produite lors de la récupération du post", err: err});
     });
 });
